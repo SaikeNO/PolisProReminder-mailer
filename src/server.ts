@@ -1,18 +1,12 @@
 import * as amqp from "amqplib/callback_api";
 import { sendEmail } from "./emailService";
-import * as dotenv from "dotenv";
+import { getEnvVariables } from "./getEnvVariables";
+import { getEmailDetailsKeys, parseToEmailDetails } from "./contracts";
 
-// Ładowanie zmiennych środowiskowych z pliku .env
-dotenv.config();
-
-const RABBITMQ_URL = process.env.RABBITMQ_URL;
-if (!RABBITMQ_URL) {
-  console.error("Brak zmiennej środowiskowej RABBITMQ_URL");
-  process.exit(1);
-}
+const env = getEnvVariables();
 
 // Połączenie z RabbitMQ
-amqp.connect(RABBITMQ_URL, (error0, connection) => {
+amqp.connect(env.RABBITMQ_URL, (error0, connection) => {
   if (error0) {
     throw error0;
   }
@@ -22,19 +16,22 @@ amqp.connect(RABBITMQ_URL, (error0, connection) => {
       throw error1;
     }
 
-    const queue = "emailQueue";
-
-    channel.assertQueue(queue, { durable: true });
-    console.log(`Oczekiwanie na wiadomości w kolejce: ${queue}`);
+    channel.assertQueue(env.RABBITMQ_QUEUE, { durable: true });
+    console.log(`Oczekiwanie na wiadomości w kolejce: ${env.RABBITMQ_QUEUE}`);
 
     // Nasłuchiwanie wiadomości
     channel.consume(
-      queue,
-      (msg) => {
-        if (msg !== null) {
-          const emailDetails = JSON.parse(msg.content.toString());
-          sendEmail(emailDetails);
-          channel.ack(msg); // Potwierdzenie przetworzenia wiadomości
+      env.RABBITMQ_QUEUE,
+      async (msg) => {
+        if (msg === null) return;
+
+        const emailDetails = parseToEmailDetails(msg.content.toString());
+
+        if (emailDetails) {
+          const result = await sendEmail(emailDetails);
+          if (!result) channel.ack(msg); // Potwierdzenie przetworzenia wiadomości jeżeli nie było błędu wysłania
+        } else {
+          console.error(`EmailDetails musi zawierać wszystkie składowe: ${getEmailDetailsKeys().join(", ")}`);
         }
       },
       { noAck: false }

@@ -1,26 +1,26 @@
-import nodemailer from "nodemailer";
+import nodemailer, { Transporter } from "nodemailer";
+import { getEnvVariables } from "./getEnvVariables";
+import { EmailDetails } from "./contracts";
 
-interface EmailDetails {
-  to: string;
-  subject: string;
-  text: string;
-}
+const env = getEnvVariables();
 
-// Funkcja do wysyłania e-maili
-export const sendEmail = async (emailDetails: EmailDetails): Promise<void> => {
-  const { to, subject, text } = emailDetails;
-
-  // Konfiguracja Nodemailer z danymi z pliku .env
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
+const createTransporter = (): Transporter => {
+  return nodemailer.createTransport({
+    host: env.EMAIL_HOST,
+    port: env.EMAIL_PORT,
+    secure: true,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: env.EMAIL_USER,
+      pass: env.EMAIL_PASS,
     },
   });
+};
+
+export const sendEmail = async ({ to, subject, text }: EmailDetails): Promise<number> => {
+  const transporter = createTransporter();
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: env.EMAIL_USER,
     to,
     subject,
     text,
@@ -29,7 +29,11 @@ export const sendEmail = async (emailDetails: EmailDetails): Promise<void> => {
   try {
     await transporter.sendMail(mailOptions);
     console.log(`Email wysłany do: ${to}`);
+    return 0;
   } catch (error) {
     console.error("Błąd przy wysyłaniu maila:", error);
+    return 1;
+  } finally {
+    transporter.close();
   }
 };
