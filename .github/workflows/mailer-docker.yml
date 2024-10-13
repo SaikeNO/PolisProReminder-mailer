@@ -24,11 +24,11 @@ jobs:
 
       - name: Build and run Docker containers
         run: |
-          docker-compose up -d --build
+          sudo docker compose up -d --build
 
       - name: Start docker containers
         run: |
           sudo docker start `sudo docker ps -a -q`
 
       - name: Check status
-        run: docker-compose ps
+        run: sudo docker compose ls
