@@ -16,7 +16,7 @@ const createTransporter = (): Transporter => {
   });
 };
 
-export const sendEmail = async ({ to, subject, text }: EmailDetails): Promise<number> => {
+export const sendEmail = async ({ to, subject, text }: EmailDetails): Promise<boolean> => {
   const transporter = createTransporter();
 
   const mailOptions = {
@@ -29,10 +29,10 @@ export const sendEmail = async ({ to, subject, text }: EmailDetails): Promise<nu
   try {
     await transporter.sendMail(mailOptions);
     console.log(`Email wysłany do: ${to}`);
-    return 0;
+    return true;
   } catch (error) {
     console.error("Błąd przy wysyłaniu maila:", error);
-    return 1;
+    return false;
   } finally {
     transporter.close();
   }
