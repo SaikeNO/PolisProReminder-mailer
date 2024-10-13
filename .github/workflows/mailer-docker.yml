@@ -23,4 +23,4 @@ jobs:
           sudo docker compose up -d --build
 
       - name: Check status
-        run: docker-compose ps
+        run: sudo docker compose ls
