@@ -10,6 +10,10 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: Stop docker containers
+        run: |
+          sudo docker stop `sudo docker ps -a -q`
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -21,6 +25,10 @@ jobs:
       - name: Build and run Docker containers
         run: |
           docker-compose up -d --build
+
+      - name: Start docker containers
+        run: |
+          sudo docker start `sudo docker ps -a -q`
 
       - name: Check status
         run: docker-compose ps

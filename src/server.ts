@@ -1,5 +1,5 @@
 import * as amqp from "amqplib/callback_api";
-import { sendEmail } from "./emailService";
+import { sendEmailWithRetry } from "./emailService";
 import { getEnvVariables } from "./getEnvVariables";
 import { getEmailDetailsKeys, parseToEmailDetails } from "./contracts";
 
@@ -28,10 +28,15 @@ amqp.connect(env.RABBITMQ_URL, (error0, connection) => {
         const emailDetails = parseToEmailDetails(msg.content.toString());
 
         if (emailDetails) {
-          const result = await sendEmail(emailDetails);
-          if (!result) channel.ack(msg); // Potwierdzenie przetworzenia wiadomości jeżeli nie było błędu wysłania
+          const result = await sendEmailWithRetry(emailDetails);
+          if (result) {
+            channel.ack(msg);
+          } else {
+            console.error("Nie udało się wysłać e-maila po maksymalnej liczbie prób.");
+          }
         } else {
           console.error(`EmailDetails musi zawierać wszystkie składowe: ${getEmailDetailsKeys().join(", ")}`);
+          channel.ack(msg);
         }
       },
       { noAck: false }

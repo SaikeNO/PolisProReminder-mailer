@@ -37,3 +37,25 @@ export const sendEmail = async ({ to, subject, text }: EmailDetails): Promise<nu
     transporter.close();
   }
 };
+
+export const sendEmailWithRetry = async (emailDetails: EmailDetails, retries = 10, delay = 5000) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const result = await sendEmail(emailDetails);
+      if (result) {
+        console.log(`Wysłanie e-maila zakończone sukcesem przy próbie ${attempt}`);
+        return true;
+      } else {
+        console.warn(`Próba ${attempt} nie powiodła się. Próba ponowienia...`);
+      }
+    } catch (error) {
+      console.error(`Błąd podczas wysyłania e-maila przy próbie ${attempt}:`, error);
+    }
+
+    // Czekaj przed kolejną próbą (w milisekundach)
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+
+  console.error("Wysłanie e-maila nie powiodło się po 10 próbach.");
+  return false;
+};
