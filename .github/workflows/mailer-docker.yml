@@ -20,7 +20,7 @@ jobs:
 
       - name: Build and run Docker containers
         run: |
-          docker compose up -d --build
+          sudo docker compose up -d --build
 
       - name: Check status
         run: docker-compose ps
