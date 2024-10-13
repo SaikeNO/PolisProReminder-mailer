@@ -2,7 +2,17 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const requiredEnvVars = ["RABBITMQ_QUEUE", "RABBITMQ_URL", "EMAIL_HOST", "EMAIL_PORT", "EMAIL_USER", "EMAIL_PASS"];
+const requiredEnvVars = [
+  "RABBITMQ_QUEUE",
+  "RABBITMQ_USER",
+  "RABBITMQ_PASS",
+  "RABBITMQ_HOST",
+  "RABBITMQ_PORT",
+  "EMAIL_HOST",
+  "EMAIL_PORT",
+  "EMAIL_USER",
+  "EMAIL_PASS",
+];
 
 export const getEnvVariables = () => {
   for (const envVar of requiredEnvVars) {
@@ -12,12 +22,15 @@ export const getEnvVariables = () => {
     }
   }
 
+  const { RABBITMQ_USER, RABBITMQ_PASS, RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_QUEUE } = process.env;
+  const { EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASS } = process.env;
+
   return {
-    RABBITMQ_URL: process.env.RABBITMQ_URL!,
-    EMAIL_HOST: process.env.EMAIL_HOST!,
-    EMAIL_PORT: parseInt(process.env.EMAIL_PORT!),
-    EMAIL_USER: process.env.EMAIL_USER!,
-    EMAIL_PASS: process.env.EMAIL_PASS!,
-    RABBITMQ_QUEUE: process.env.RABBITMQ_QUEUE!,
+    RABBITMQ_URL: `amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@${RABBITMQ_HOST}:${RABBITMQ_PORT}`,
+    EMAIL_HOST: EMAIL_HOST!,
+    EMAIL_PORT: parseInt(EMAIL_PORT!),
+    EMAIL_USER: EMAIL_USER!,
+    EMAIL_PASS: EMAIL_PASS!,
+    RABBITMQ_QUEUE: RABBITMQ_QUEUE!,
   };
 };

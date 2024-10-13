@@ -1,13 +1,14 @@
-name: polisproreminder-mailer
+name: polisproreminder-mailer-dev
 services:
   rabbitmq:
-    image: rabbitmq:3-alpine
-    container_name: polis-pro-reminder-rabbitmq
+    image: rabbitmq:3-management-alpine
+    container_name: polis-pro-reminder-rabbitmq-dev
     ports:
       - "5672:5672"
+      - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
     networks:
       - rabbitmq_network
 
@@ -15,10 +16,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: polis-pro-reminder-mailer
+    container_name: polis-pro-reminder-mailer-dev
     restart: always
     env_file:
-      - .env
+      - .env.dev
     depends_on:
       - rabbitmq
     networks:

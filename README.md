@@ -15,7 +15,7 @@ The `PolisProReminder Mailer` is a Node.js service built in TypeScript that list
 
 ### `.env` File
 
-To make the application work properly, create a `.env` from `.env.example` and fill all the required environment variables:
+To make the application work properly, create a `.env.dev` from `.env.example` and fill all the required environment variables:
 
 ```
 EMAIL_HOST=smtp.example.com
@@ -59,7 +59,7 @@ The application will listen for messages from the RabbitMQ queue and process the
 The application requires running RabbitMQ.
 
 ```bash
-docker-compose up -d
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
 RabbitMQ will be available on port 5672 (for communication) and 15672 (management panel).
@@ -118,6 +118,7 @@ package.json                # Dependencies and run scripts
 - Lists dependencies like `nodemailer` for sending emails, `amqplib` for RabbitMQ, and `dotenv` for environment variables management.
 
 ## Sample Message in RabbitMQ
+
 To test the application, you can send a message to the RabbitMQ queue with the following content:
 
 ```json
