@@ -36,7 +36,17 @@ The application requires the following environment variables:
 
 ## Getting Started
 
-### Install Dependencies
+### Quick Start
+
+To run the application and RabbitMQ, all you need is Docker installed. Simply execute the following command:
+
+```bash
+docker-compose -f docker-compose.dev.yml up -d
+```
+
+This command will start both RabbitMQ and the mailer application. RabbitMQ will be available on port 5672 (for communication) and 15672 (management panel).
+
+### Or do it mannualy
 
 Install the required dependencies by running:
 
@@ -59,7 +69,7 @@ The application will listen for messages from the RabbitMQ queue and process the
 The application requires running RabbitMQ.
 
 ```bash
-docker-compose -f docker-compose.dev.yml up -d
+docker run -d --hostname my-rabbit --name some-rabbit -e RABBITMQ_DEFAULT_USER=guest -e RABBITMQ_DEFAULT_PASS=guest rabbitmq:3-management
 ```
 
 RabbitMQ will be available on port 5672 (for communication) and 15672 (management panel).
@@ -92,6 +102,7 @@ package.json                # Dependencies and run scripts
 - Contains the `sendEmail` function that sends an email using the provided `EmailDetails`.
 - Uses environment variables for SMTP configuration and authentication.
 - Includes error handling and logging to ensure proper email delivery.
+- Supports retrying email sending with the `sendEmailWithRetry` function.
 
 ### `getEnvVariables.ts`
 
