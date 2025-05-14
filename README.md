@@ -139,3 +139,13 @@ To test the application, you can send a message to the RabbitMQ queue with the f
   "text": "This is the content of the test email."
 }
 ```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Email Sending Failure**  
+   Verify the SMTP configuration in the `.env` file. Check if the `EMAIL_HOST`, `EMAIL_USER`, and `EMAIL_PASS` values are correct.
+
+2. **Missing Environment Variables**  
+   Double-check that all required environment variables are defined in the `.env` file.
