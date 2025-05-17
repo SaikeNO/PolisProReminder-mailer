@@ -23,7 +23,7 @@ export const sendEmail = async ({ to, subject, text }: EmailDetails): Promise<bo
     from: env.EMAIL_USER,
     to,
     subject,
-    text,
+    html: text,
   };
 
   try {
